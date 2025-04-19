@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+
+<div class="container">
+    <header class="d-flex flex-column align-items-center">
+        <h1>Garden Planner</h1>
+        <nav class="d-flex justify-content-center">
+            <ul class="nav">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/">Home</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/calendar">Calendar</NavLink>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        @Body
+    </main>
+</div>
