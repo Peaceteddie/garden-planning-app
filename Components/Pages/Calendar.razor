@@ -1,1 +1,41 @@
 @page "/calendar"
+@using Models
+@using Components.Dialogs
+@namespace Components.Pages
+@rendermode InteractiveServer
+
+<header class="bg-primary text-white p-3">
+    <h2>@(DisplayingMonth?.ToString("MMMM yyyy"))</h2>
+</header>
+
+<table class="table table-bordered mt-3 w-100">
+    <thead class="thead-dark">
+        <tr>
+            @foreach (var dayName in DayNames)
+            {
+                <th scope="col" style="width: @DayWidthPercentage;">@dayName</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var week in CalendarWeeks)
+        {
+            <tr>
+                @foreach (var day in week)
+                {
+                    <td class="@GetCellClass(day)" @onclick="(_) => OpenDay(day)">
+                        @if (day.HasValue)
+                        {
+                            @day.Value.Day
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ShowDialog && DialogDate.HasValue)
+{
+    <AddCrop Date="@DialogDate.Value" OnSubmit="CloseDialog" />
+}

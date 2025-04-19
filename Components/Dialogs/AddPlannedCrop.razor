@@ -1,0 +1,48 @@
+@using Models;
+@using Microsoft.AspNetCore.Components.Forms
+@namespace Components.Dialogs
+
+<div class="dialog-container">
+    <h3 class="dialog-title">Add Crop for @Date.ToShortDateString()</h3>
+    <EditForm Model="@PlannedCrop" OnValidSubmit="@OnValidSubmit" OnInvalidSubmit="@OnInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="cropName">Crop Name</label>
+            <InputText id="cropName" @bind-Value="PlannedCrop.CropName" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="quantity">Quantity (kg)</label>
+            <InputNumber id="quantity" @bind-Value="PlannedCrop.Quantity" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="plantingDate">Planting Date</label>
+            <InputDate id="plantingDate" @bind-Value="PlannedCrop.PlantingDate" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick="CloseDialog">Cancel</button>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public DateTime Date { get; set; }
+    [Parameter] public EventCallback<PlannedCrop?> OnSubmit { get; set; }
+
+    private PlannedCrop PlannedCrop = new PlannedCrop();
+
+    private async Task OnValidSubmit()
+    {
+        PlannedCrop.PlantingDate = DateTime.Now;
+        await OnSubmit.InvokeAsync(PlannedCrop);
+    }
+
+    private void OnInvalidSubmit(EditContext context)
+    {
+        // Handle invalid submission if needed
+    }
+    private void CloseDialog()
+    {
+        // Logic to close the dialog if needed
+    }
+}

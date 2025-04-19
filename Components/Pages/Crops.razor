@@ -1,0 +1,17 @@
+@page "/crops"
+@using Models
+@using Components.Dialogs
+@inject CropDBContext DBContext
+
+<h3>Crops</h3>
+@foreach (var crop in Crops)
+{
+    <div class="crop-card">
+        <h4>@crop.CropName</h4>
+        <p>Quantity: @crop.Quantity kg</p>
+        <p>Planting Date: @crop.PlantingDate.ToShortDateString()</p>
+        <button class="btn btn-danger" @onclick="() => DeleteCrop(crop)">Delete</button>
+    </div>
+}
+<button class="btn btn-primary" @onclick="ShowAddCropDialog">Add Crop</button>
+@if (showAddCropDialog)
