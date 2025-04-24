@@ -1,0 +1,98 @@
+@inject GardenContext Context
+@namespace Components.Pages
+@page "/crops"
+@rendermode InteractiveServer
+@using Components.Dialogs
+@using Microsoft.EntityFrameworkCore
+@using Models
+@using System.Globalization
+@using System.Linq
+@using System.Reflection
+
+<aside class="sidebar">
+    <div class="mb-3">
+        <label for="cropTypeFilter" class="form-label">Crop Type</label>
+        <select @bind="SelectedCropType" id="cropTypeFilter" class="form-select">
+            <option value="">All</option>
+            @foreach (var cropType in Enum.GetValues<CropType>())
+            {
+                <option value="@cropType">@cropType</option>
+            }
+        </select>
+    </div>
+</aside>
+
+<h3 class="mb-3">Crops</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            @foreach (PropertyInfo prop in CropProperties())
+            {
+                <th @onclick="()=>SortBy(prop.Name)">
+                    @(prop.Name)
+                    @(SortProperty == prop.Name ? (SortDirection == SortDirections.Ascending ? "↑" : "↓") : "")
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var crop in SortedCrops)
+        {
+            <tr>
+                @foreach (var prop in CropProperties())
+                {
+                    <td>@prop.GetValue(crop)</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    enum SortDirections
+    {
+        Ascending,
+        Descending
+    }
+
+    CropType? SelectedCropType { get; set; }
+    SortDirections SortDirection { get; set; } = SortDirections.Ascending;
+    string SortProperty { get; set; } = "Name";
+
+    List<Crop> SortedCrops =>
+    SortDirection == SortDirections.Ascending
+    ? ApplyFilters(Context.Crops.ToList()).OrderBy(GetSortExpression()).ToList()
+    : ApplyFilters(Context.Crops.ToList()).OrderByDescending(GetSortExpression()).ToList();
+
+    IEnumerable<Crop> ApplyFilters(IEnumerable<Crop> crops) =>
+    SelectedCropType.HasValue
+    ? crops.Where(c => c.Type == SelectedCropType.Value)
+    : crops;
+
+    Func<Crop, object?> GetSortExpression() =>
+    typeof(Crop).GetProperty(SortProperty) != null
+    ? c => typeof(Crop).GetProperty(SortProperty)!.GetValue(c)
+    : c => c.Name;
+
+    void SortBy(string propertyName)
+    {
+        if (propertyName == SortProperty)
+        {
+            SortDirection =
+            SortDirection == SortDirections.Ascending
+            ? SortDirections.Descending
+            : SortDirections.Ascending;
+        }
+        else
+        {
+            SortProperty = propertyName;
+            SortDirection = SortDirections.Ascending;
+        }
+    }
+
+    PropertyInfo[] CropProperties() =>
+    typeof(Crop)
+    .GetProperties()
+    .Where(p => p.PropertyType.IsEnum || p.PropertyType.IsPrimitive || p.PropertyType == typeof(string))
+    .ToArray();
+}

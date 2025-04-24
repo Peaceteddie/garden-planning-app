@@ -1,8 +1,8 @@
-@page "/calendar"
-@using Models
-@using Components.Dialogs
 @namespace Components.Pages
+@page "/calendar"
 @rendermode InteractiveServer
+@using Components.Dialogs
+@using Models
 
 <header class="bg-primary text-white p-3">
     <h2>@(DisplayingMonth?.ToString("MMMM yyyy"))</h2>
@@ -37,5 +37,5 @@
 
 @if (ShowDialog && DialogDate.HasValue)
 {
-    <AddCrop Date="@DialogDate.Value" OnSubmit="CloseDialog" />
+    <AddPlannedCrop Date="@DialogDate.Value" OnSubmit="CloseDialog" />
 }
